@@ -4,13 +4,15 @@
 #define TP1_H_
 
 #include <stdlib.h>
-
+#include "lista.h"
 #include "pokemon.h"
 
 #define ERROR -1
 #define EXITO 0
 
-typedef struct _hospital_pkm_t hospital_t;
+typedef struct _hospital_pkm_t {
+	lista_t *pokemones;
+} hospital_t;
 
 /**
  * Lee un archivo con pokemones y crea un hospital con esos pokemones.
