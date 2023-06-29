@@ -31,7 +31,7 @@ lista_t *lista_insertar(lista_t *lista, void *elemento);
  * en caso de exito.
  */
 lista_t *lista_insertar_en_posicion(lista_t *lista, void *elemento,
-				    size_t posicion);
+                                    size_t posicion);
 
 /**
  * Quita de la lista el elemento que se encuentra en la ultima posición.
@@ -67,7 +67,7 @@ void *lista_elemento_en_posicion(lista_t *lista, size_t posicion);
  * Si no existe el elemento devuelve NULL.
  */
 void *lista_buscar_elemento(lista_t *lista, int (*comparador)(void *, void *),
-			    void *contexto);
+                            void *contexto);
 
 /**
  * Devuelve el primer elemento de la lista o NULL si la lista se
@@ -156,13 +156,13 @@ void lista_iterador_destruir(lista_iterador_t *iterador);
  *
  */
 size_t lista_con_cada_elemento(lista_t *lista, bool (*funcion)(void *, void *),
-			       void *contexto);
+                               void *contexto);
 
-// Agrega un nuevo elemento en la posición actual del iterador de la lista, de manera
-// que al finalizar la inserción, el nodo actual es el nodo insertado y el nodo previo
-// no cambió. Devuelve falso en caso de error.
-// Pre: la lista  y el iterador fueron creados.
-// Post: fue insertado un nuevo elemento a la lista, en la posición actual del iterador.
+// Agrega un nuevo elemento en la posición actual del iterador de la lista, de
+// manera que al finalizar la inserción, el nodo actual es el nodo insertado y
+// el nodo previo no cambió. Devuelve falso en caso de error. Pre: la lista  y
+// el iterador fueron creados. Post: fue insertado un nuevo elemento a la lista,
+// en la posición actual del iterador.
 bool lista_iterador_insertar(lista_iterador_t *iter, void *dato);
 
 // Borra un el elemento de la posición actual del iterador de la lista, de

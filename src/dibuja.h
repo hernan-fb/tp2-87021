@@ -1,7 +1,7 @@
 #ifndef DIBUJA_H_
 #define DIBUJA_H_
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 bool dibuja_imagen(const char *ruta_imagen_ascii);
 

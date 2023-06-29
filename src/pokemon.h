@@ -1,7 +1,7 @@
 #ifndef POKEMON_H_
 #define POKEMON_H_
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 typedef struct _pkm_t pokemon_t;
 
@@ -24,8 +24,8 @@ pokemon_t *pokemon_crear_desde_string(const char *string);
 pokemon_t *pokemon_copiar(pokemon_t *poke);
 
 /**
- * Dados dos pokemones, la funcion devuelve true si son iguales, es decir, todos sus atributos son identicos
- * o false en caso contrario.
+ * Dados dos pokemones, la funcion devuelve true si son iguales, es decir, todos
+ * sus atributos son identicos o false en caso contrario.
  */
 bool pokemon_son_iguales(pokemon_t *pokemon1, pokemon_t *pokemon2);
 
@@ -35,7 +35,8 @@ bool pokemon_son_iguales(pokemon_t *pokemon1, pokemon_t *pokemon2);
 char *pokemon_nombre(pokemon_t *pokemon);
 
 /**
- * Devuelve el nombre del entrenador asociado al pokemon o NULL en caso de no existir el pokemon.
+ * Devuelve el nombre del entrenador asociado al pokemon o NULL en caso de no
+ * existir el pokemon.
  */
 char *pokemon_entrenador(pokemon_t *pokemon);
 

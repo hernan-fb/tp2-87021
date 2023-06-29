@@ -2,19 +2,19 @@
 #include <math.h>
 
 bool dibuja_imagen(const char *ruta_imagen_ascii) {
-    FILE *archivo;
-    char linea[256];
-    archivo = fopen(ruta_imagen_ascii, "r");
-    if (archivo == NULL) {
-        printf(" ~#/imagen/#~ .\n");
-        return false;
-    }
+  FILE *archivo;
+  char linea[256];
+  archivo = fopen(ruta_imagen_ascii, "r");
+  if (archivo == NULL) {
+    printf(" ~#/imagen/#~ .\n");
+    return false;
+  }
 
-    while (fgets(linea, sizeof(linea), archivo)) {
-        printf("%s", linea);
-    }
+  while (fgets(linea, sizeof(linea), archivo)) {
+    printf("%s", linea);
+  }
 
-    fclose(archivo);
+  fclose(archivo);
 
-    return true;
+  return true;
 }

@@ -10,10 +10,10 @@
 #define MAX_NOMBRE 30
 
 struct _pkm_t {
-	size_t id;
-	size_t salud;
-	char nombre_entrenador[MAX_NOMBRE];
-	char nombre[MAX_NOMBRE];
+  size_t id;
+  size_t salud;
+  char nombre_entrenador[MAX_NOMBRE];
+  char nombre[MAX_NOMBRE];
 };
 
 #endif // POKEMON_PRIVADO_H_
