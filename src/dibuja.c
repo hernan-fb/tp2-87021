@@ -6,7 +6,7 @@ bool dibuja_imagen(const char *ruta_imagen_ascii) {
     char linea[256];
     archivo = fopen(ruta_imagen_ascii, "r");
     if (archivo == NULL) {
-        printf("No se pudo abrir el archivo.\n");
+        printf(" ~#/imagen/#~ .\n");
         return false;
     }
 

@@ -11,8 +11,15 @@
 #define MAX_HOSPITALES 10
 #define MAX_NOMBRE_ARCHIVO 100
 
-const char *imagenes[] = {"img/bulbasaur-solo.txt", "img/charmander-solo.txt", "img/squirtle-solo.txt", "img/pikatchu1.txt", NULL};
+const char *imagenes[] = {  "img/_bulbasaur-solo_.txt", 
+                            "img/_charmander1_.txt", 
+                            "img/_charmander-bis_.txt", 
+                            "img/_pikatchu1_.txt", 
+                            "img/_squirtle-solo_.txt",
+                            NULL};
+const size_t cantidad_imagenes = 5;
 const char *imagen_bienvenida[] = {"img/_bienvenido_a_color_.txt"};
+bool flag = false;
 typedef enum {
     BULBASAUR,
     CHARMANDER,
@@ -38,28 +45,28 @@ int obtener_numero_hospital_activo() {
     return hospital_activo;
 }
 
-void comando_salir() {
+bool comando_salir() {
     // Liberar la memoria de los hospitales cargados
     for (int i = 0; i < hospitales_cargados; i++) {
         hospital_destruir(hospitales[i].hospital);
     }
-    exit(0);
+    return false;
 }
 
-void comando_cargar() {
+bool comando_cargar() {
     char nombreArchivo[MAX_NOMBRE_ARCHIVO];
     printf("Ingrese el nombre del archivo: ");
     scanf("%s", nombreArchivo);
 
     if (hospitales_cargados >= MAX_HOSPITALES) {
         printf("No se pueden cargar más hospitales. Límite alcanzado.\n");
-        return;
+        return true;
     }
 
     hospital_t* hospital = hospital_crear_desde_archivo(nombreArchivo);
     if (hospital == NULL) {
         printf("No se pudo cargar el hospital desde el archivo.\n");
-        return;
+        return true;
     }
 
     hospitales[hospitales_cargados].id = hospitales_cargados + 1;
@@ -68,9 +75,10 @@ void comando_cargar() {
     hospitales_cargados++;
 
     printf("Hospital cargado exitosamente.\n");
+    return true;
 }
 
-void comando_estado() {
+bool comando_estado() {
     printf("Hospitales cargados:\n");
     for (int i = 0; i < hospitales_cargados; i++) {
         printf("%d. %s\n", hospitales[i].id, hospitales[i].nombreArchivo);
@@ -80,20 +88,22 @@ void comando_estado() {
     if (numero_hospital_activo != -1) {
         printf("Hospital activo: %d. %s\n", hospitales[numero_hospital_activo].id, hospitales[numero_hospital_activo].nombreArchivo);
     }
+    return true;
 }
 
-void comando_activar() {
+bool comando_activar() {
     int id;
     printf("Ingrese el número de identificación del hospital a activar: ");
     scanf("%d", &id);
 
     if (id < 1 || id > hospitales_cargados) {
         printf("Número de hospital inválido.\n");
-        return;
+        return true;
     }
 
     hospital_activo = id - 1;
     printf("Hospital activado: %d. %s\n", hospitales[hospital_activo].id, hospitales[hospital_activo].nombreArchivo);
+    return true;
 }
 
 bool wrapper_imprimir_pokemon(void* poke, void* contexto) {
@@ -114,24 +124,25 @@ void listar_pokemones(hospital_t* hospital, bool wrapper(void*, void*)) {
 	return;
 }
 
-void comando_listar_nombres() {
+bool comando_listar_nombres() {
     int numero_hospital_activo = obtener_numero_hospital_activo();
     if (numero_hospital_activo != -1) {
         hospital_t* hospital = hospitales[numero_hospital_activo].hospital;
 		listar_pokemones(hospital, wrapper_imprimir_nombre_pokemon);
     }
-	return;
+    return true;
 }
 
-void comando_listar_en_detalle() {
+bool comando_listar_en_detalle() {
     int numero_hospital_activo = obtener_numero_hospital_activo();
     if (numero_hospital_activo != -1) {
         hospital_t* hospital = hospitales[numero_hospital_activo].hospital;
         listar_pokemones(hospital, wrapper_imprimir_pokemon);
     }
+    return true;
 }
 
-void comando_destruir() {
+bool comando_destruir() {
     int numero_hospital_activo = obtener_numero_hospital_activo();
     if (numero_hospital_activo != -1) {
         hospital_destruir(hospitales[numero_hospital_activo].hospital);
@@ -143,19 +154,43 @@ void comando_destruir() {
         hospitales_cargados--;
         hospital_activo = -1;
     }
+    return true;
 }
 
-void comando_mostrar_creditos() {
-    printf("\n\nEste es un programa de licencia libre desarrollado por el alumno Hernán Fernández Brando\n");
+bool comando_mostrar_creditos() {
+    printf("\n\n\tEste es un programa de licencia libre desarrollado por el alumno Hernán Fernández Brando\n");
     printf("\tEn la cátedra \"Mendez\" de Algoritmos y programación 2,\n");
     printf("\ten el primer ciclo lectivo del año MMXXIII.\n");
-    printf("\t\tCopyright 2023 © - todos los derechos están reservados.\n");
+    printf("\n\tCopyright 2023 © - todos los derechos están reservados.\n");
+    return true;
+}
+
+bool comando_este_menu() {
+    if (flag == false) {
+        flag = true;
+        printf("\t ups.... eso no hizo nada! ¿quién hizo el enunciado de este tp? xD\n");
+
+        printf("\n presione una tecla para volver al menú anterior...\n");
+        limpiar_buffer_entrada();
+
+        printf("\tEra una broma!\n");
+        printf("\tPero como este menu se llama ayuda, te cuento lo siguiente:\n");
+    }
+    printf("\tUsar este programa es muy fácil, \n");
+    printf("\tsolamente tenés que elegir la opción deseada en cada menú que te aparezca\n");
+    printf("\ty seguir las instrucciones que se indiquen por pantalla.");
+    printf("\n\tY para elegir una opción cualquiera tenés dos métodos:\n");
+    printf("\t\t1. Escribiendo toda la frase que está subrayada en esa opción.\n");
+    printf("\t\t2. Escribiendo la letra que está entre paréntesis al final de cada opción.\n");
+    printf("\n\n\tY listo. Que te diviertas!\n");
+    printf("\n");
+    return true;
 }
 
 menu_t* crear_menu_principal() {
-    menu_t* menu_principal = menu_crear(false, imagenes, 4, NULL);
+    menu_t* menu_principal = menu_crear(false, imagenes, cantidad_imagenes, NULL);
     menu_agregar_opcion(menu_principal, "salir", "Salir del programa.", 's', comando_salir);
-    menu_agregar_opcion(menu_principal, "ayuda", "Muestra este menú de ayuda.", 'h', comando_salir);
+    menu_agregar_opcion(menu_principal, "ayuda", "Muestra este menú de ayuda.", 'h', comando_este_menu);
     menu_agregar_opcion(menu_principal, "cargar", "Desde un archivo cargar un hospital.", 'c', comando_cargar);
     menu_agregar_opcion(menu_principal, "mostrar", "Mostrar todos los hospitales: los cargados y el activo.", 'e', comando_estado);
     menu_agregar_opcion(menu_principal, "activar", "Activar un hospital por su número de identificación.", 'a', comando_activar);
@@ -165,12 +200,15 @@ menu_t* crear_menu_principal() {
     return menu_principal;
 }
 
-void comando_menu_principal() {
+bool comando_menu_principal() {
     menu_t* menu_principal = crear_menu_principal();
-    while(1) {
+    bool continuar_jugando = true;
+    while(continuar_jugando) {
         menu_mostrar(menu_principal);
-        menu_get_eleccion_usuario(menu_principal);
+        continuar_jugando = menu_get_eleccion_usuario(menu_principal);
     }
+    menu_destruir(menu_principal);
+    return false;
 }
 
 menu_t* crear_menu_bienvenida() {
@@ -185,10 +223,11 @@ int main() {
     char opcion;
 
     menu_t* menu_bienvenida = crear_menu_bienvenida();
-
-    while(1) {
+    bool continuar_jugando = true;
+    while(continuar_jugando) {
         menu_mostrar(menu_bienvenida);
-        menu_get_eleccion_usuario(menu_bienvenida);
+        continuar_jugando = menu_get_eleccion_usuario(menu_bienvenida);
     }
+    menu_destruir(menu_bienvenida);
     return 0;
 }
