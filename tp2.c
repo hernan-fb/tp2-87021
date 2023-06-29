@@ -2,11 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include "src/tp1.h"
+#include "src/pokemon.h"
+#include "src/pokemon_privado.h"
 #include "src/lista.h"
 #include "src/dibuja.h"
+#include "src/menu.h"
 
 #define MAX_HOSPITALES 10
 #define MAX_NOMBRE_ARCHIVO 100
+
+const char *imagenes[] = {"img/bulbasaur-solo.txt", "img/charmander-solo.txt", "img/squirtle-solo.txt", "img/pikatchu1.txt", NULL};
+const char *imagen_bienvenida[] = {"img/_bienvenido_a_color_.txt"};
+typedef enum {
+    BULBASAUR,
+    CHARMANDER,
+    SQUIRTLE,
+    PIKACHU
+} pokebola_t;
 
 typedef struct {
     int id;
@@ -17,19 +29,6 @@ typedef struct {
 hospital_info_t hospitales[MAX_HOSPITALES];
 int hospitales_cargados = 0;
 int hospital_activo = -1;
-
-void mostrar_menu_ayuda() {
-	dibuja_imagen_poke(PIKACHU);
-    printf("Comandos disponibles:\n");
-    printf("  S (salir/exit): Sale del programa.\n");
-    printf("  H (ayuda/help): Muestra este menú de ayuda.\n");
-    printf("  C (cargar): Carga un hospital desde un archivo.\n");
-    printf("  E (estado): Muestra los hospitales cargados y el activo.\n");
-    printf("  A (activar): Activa un hospital por su número de identificación.\n");
-    printf("  M (mostrar): Muestra los nombres de todos los pokemones en el hospital activo.\n");
-    printf("  L (listar): Muestra un listado detallado de todos los pokemones en el hospital activo.\n");
-    printf("  D (destruir): Destruye el hospital activo.\n");
-}
 
 int obtener_numero_hospital_activo() {
     if (hospital_activo == -1) {
@@ -42,7 +41,7 @@ int obtener_numero_hospital_activo() {
 void comando_salir() {
     // Liberar la memoria de los hospitales cargados
     for (int i = 0; i < hospitales_cargados; i++) {
-        destruir_hospital(hospitales[i].hospital);
+        hospital_destruir(hospitales[i].hospital);
     }
     exit(0);
 }
@@ -97,41 +96,45 @@ void comando_activar() {
     printf("Hospital activado: %d. %s\n", hospitales[hospital_activo].id, hospitales[hospital_activo].nombreArchivo);
 }
 
-bool wrapper_imprimir_pokemon(pokemon_t *poke, void* contexto) {
-	printf("Este es el pokemon id: %zu,\n\t\tNombre: \t%s\n\t\tEntrenador: %s\n\t\tSalud: \t%zu\n", 
-	pokemon_id(poke), 
-	pokemon_nombre(poke),
-	pokemon_entrenador(poke),
-	pokemon_salud(poke));
+bool wrapper_imprimir_pokemon(void* poke, void* contexto) {
+	printf("Este es el pokemon \tid: \t\t%zu,\n\t\t\tNombre: \t%s\n\t\t\tEntrenador:\t%s\n\t\t\tSalud:\t\t%zu\n", 
+	pokemon_id((pokemon_t*)poke), 
+	pokemon_nombre((pokemon_t*)poke),
+	pokemon_entrenador((pokemon_t*)poke),
+	pokemon_salud((pokemon_t*)poke));
+	return true;
+}
+bool wrapper_imprimir_nombre_pokemon(void* poke, void* contexto) {
+	printf("Este es el pokemon \tNombre: \t%s\n", pokemon_nombre((pokemon_t*)poke));
 	return true;
 }
 
-void comando_mostrar() {
+void listar_pokemones(hospital_t* hospital, bool wrapper(void*, void*)) {
+    lista_con_cada_elemento(hospital->pokemones, wrapper, NULL);
+	return;
+}
+
+void comando_listar_nombres() {
     int numero_hospital_activo = obtener_numero_hospital_activo();
     if (numero_hospital_activo != -1) {
         hospital_t* hospital = hospitales[numero_hospital_activo].hospital;
-		listar_pokemones(hospital);
+		listar_pokemones(hospital, wrapper_imprimir_nombre_pokemon);
     }
 	return;
 }
 
-void listar_pokemones(hospital_t* hospital) {
-    lista_con_cada_elemento(hospital->pokemones, wrapper_imprimir_pokemon, NULL);
-	return;
-}
-
-void comando_listar() {
+void comando_listar_en_detalle() {
     int numero_hospital_activo = obtener_numero_hospital_activo();
     if (numero_hospital_activo != -1) {
         hospital_t* hospital = hospitales[numero_hospital_activo].hospital;
-        listar_pokemones(hospital);
+        listar_pokemones(hospital, wrapper_imprimir_pokemon);
     }
 }
 
 void comando_destruir() {
     int numero_hospital_activo = obtener_numero_hospital_activo();
     if (numero_hospital_activo != -1) {
-        destruir_hospital(hospitales[numero_hospital_activo].hospital);
+        hospital_destruir(hospitales[numero_hospital_activo].hospital);
         printf("Hospital destruido.\n");
         // Mover los hospitales restantes hacia la izquierda en el arreglo hospitales
         for (int i = numero_hospital_activo; i < hospitales_cargados - 1; i++) {
@@ -142,44 +145,50 @@ void comando_destruir() {
     }
 }
 
+void comando_mostrar_creditos() {
+    printf("\n\nEste es un programa de licencia libre desarrollado por el alumno Hernán Fernández Brando\n");
+    printf("\tEn la cátedra \"Mendez\" de Algoritmos y programación 2,\n");
+    printf("\ten el primer ciclo lectivo del año MMXXIII.\n");
+    printf("\t\tCopyright 2023 © - todos los derechos están reservados.\n");
+}
+
+menu_t* crear_menu_principal() {
+    menu_t* menu_principal = menu_crear(false, imagenes, 4, NULL);
+    menu_agregar_opcion(menu_principal, "salir", "Salir del programa.", 's', comando_salir);
+    menu_agregar_opcion(menu_principal, "ayuda", "Muestra este menú de ayuda.", 'h', comando_salir);
+    menu_agregar_opcion(menu_principal, "cargar", "Desde un archivo cargar un hospital.", 'c', comando_cargar);
+    menu_agregar_opcion(menu_principal, "mostrar", "Mostrar todos los hospitales: los cargados y el activo.", 'e', comando_estado);
+    menu_agregar_opcion(menu_principal, "activar", "Activar un hospital por su número de identificación.", 'a', comando_activar);
+    menu_agregar_opcion(menu_principal, "listar nombres", "Listar nombres de los pokemones del hospital activo.", 'm', comando_listar_nombres);
+    menu_agregar_opcion(menu_principal, "listar en detalle", "Listar en detalle los pokemones del hospital activo.", 'l', comando_listar_en_detalle);
+    menu_agregar_opcion(menu_principal, "destruir", "Destruir el hospital activo.", 'd', comando_destruir);
+    return menu_principal;
+}
+
+void comando_menu_principal() {
+    menu_t* menu_principal = crear_menu_principal();
+    while(1) {
+        menu_mostrar(menu_principal);
+        menu_get_eleccion_usuario(menu_principal);
+    }
+}
+
+menu_t* crear_menu_bienvenida() {
+    menu_t* menu_bienvenida = menu_crear(false, imagen_bienvenida, 1, NULL);
+    menu_agregar_opcion(menu_bienvenida, "salir", "Salir del programa.", 's', comando_salir);
+    menu_agregar_opcion(menu_bienvenida, "jugar", "Empezar a jugar con los pokes.", 'j', comando_menu_principal);
+    menu_agregar_opcion(menu_bienvenida, "creditos", "Creditos con copyright HernánF.B.", 'c', comando_mostrar_creditos);
+    return menu_bienvenida;
+}
+
 int main() {
     char opcion;
-    mostrar_menu_ayuda();
 
-    while (1) {
-        printf("\nIngrese una opción: ");
-        scanf(" %c", &opcion);
+    menu_t* menu_bienvenida = crear_menu_bienvenida();
 
-        switch (opcion) {
-            case 'S':
-                comando_salir();
-                break;
-            case 'H':
-                mostrar_menu_ayuda();
-                break;
-            case 'C':
-                comando_cargar();
-                break;
-            case 'E':
-                comando_estado();
-                break;
-            case 'A':
-                comando_activar();
-                break;
-            case 'M':
-                comando_mostrar();
-                break;
-            case 'L':
-                comando_listar();
-                break;
-            case 'D':
-                comando_destruir();
-                break;
-            default:
-                printf("Opción inválida. Ingrese 'H' para ver los comandos disponibles.\n");
-                break;
-        }
+    while(1) {
+        menu_mostrar(menu_bienvenida);
+        menu_get_eleccion_usuario(menu_bienvenida);
     }
-
     return 0;
 }
