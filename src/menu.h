@@ -14,7 +14,7 @@ typedef struct {
   char *nombre_alias;
   char *letra_alias;
   char *descripcion;
-  bool (*accion)(); // menu_t* nuevo_menu, void* aux
+  bool (*accion)();
 } opcion_t;
 
 // TDA Menu
@@ -40,8 +40,7 @@ bool menu_destruir(menu_t *menu);
 
 // Agregar una opción al menú
 bool menu_agregar_opcion(menu_t *menu, char *nombre, char *texto_descripcion,
-                         char letra,
-                         bool (*accion)()); // menu_t* nuevo_menu, void* aux
+                         char letra, bool (*accion)());
 
 bool imprime_opcion_de_menu(const char *clave, void *valor, void *aux);
 

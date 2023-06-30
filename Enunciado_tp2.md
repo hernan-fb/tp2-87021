@@ -66,3 +66,96 @@ Análisis de cambios en la complejidad de las operaciones:  Dependiendo del TDA 
 - Tenga en cuenta que el usuario no tiene por qué saber cómo manejar su aplicación ni saber qué está sucediendo. Muestre por pantalla la información apropiada para guiar al usuario sin ser molesto.
 
 - Incluya en el informe todas las suposiciones que se hayan tomado (cosas que no queden claras en el enunciado por ejemplo) y diagramas de memoria explicando cómo se almacenan los datos.
+
+El código que proporcionado consta de varios archivos, cada uno con una funcionalidad específica. A continuación, doy una explicación simple y clara de cada uno de ellos:
+
+#### menu.c y menu.h
+  * `menu_crear`: Esta función se encarga de crear un nuevo menú. Recibe como parámetros un booleano para indicar si se deben mostrar los comandos previos, un arreglo con las rutas de las imágenes, la cantidad de imágenes, y un puntero a una función de acción en caso de error dentro del menú. Esta función reserva memoria para una estructura menu_t, inicializa sus campos y crea dos tablas hash (hash_nombre_opcion y hash_letra_nombre). Retorna el puntero al menú creado.
+
+  * `opcion_destruir`: Esta función es utilizada para destruir una opción del menú. Recibe un puntero a una opción y libera la memoria asignada a sus campos.
+
+  * `menu_destruir`: Esta función se encarga de destruir el menú y liberar la memoria asignada. Libera la memoria de las tablas hash y de la estructura menu_t.
+
+  * `menu_agregar_opcion`: Esta función se encarga de agregar una opción al menú. Recibe como parámetros un puntero al menú, el nombre de la opción, la descripción de la opción, un carácter para el alias de la opción y un puntero a una función de acción, acción a realizar al ser seleccionada la opción en cuestión. Se realizan varias validaciones y luego se inserta la opción en 2 tablas hash del menú utilizando el nombre y el alias como claves.
+
+  * `imprime_opcion_de_menu`: Esta función se utiliza como función de callback en la función hash_con_cada_clave, que a su vez se utilizan en menu_mostrar (para mostrar las opciones del menu por pantalla). Imprime por pantalla la descripción y el alias de una opción del menú.
+
+  * `menu_mostrar`: Esta función muestra el menú por pantalla. Primero limpia la pantalla si no se deben mostrar los comandos previos. Luego, si hay imágenes en el menú, muestra una imagen aleatoria. A continuación, imprime los comandos disponibles utilizando la función hash_con_cada_clave con imprime_opcion_de_menu como función de callback.
+
+  * `menu_cuantas_opciones_fueron_agregadas`: Esta función retorna la cantidad de opciones que han sido agregadas al menú. Utiliza la función hash_cantidad para obtener el tamaño de la tabla hash hash_letra_nombre.
+
+  * `limpiar_buffer_entrada`: Esta función se encarga de limpiar el búfer de entrada. Lee caracteres del búfer hasta encontrar un salto de línea o llegar al final del archivo.
+  Esta función se agregó ya que en ocasiones el buffer de entrada quedaba con información y la pantalla se reiniciaba sola sin permitir al usuario ver los resultados de las operaciones que acababa de realizar.
+
+  * `menu_get_eleccion_usuario`: Esta función muestra por pantalla un mensaje para que el usuario ingrese una opción. Lee la opción ingresada por el usuario y realiza las validaciones correspondientes. Luego, utiliza las tablas hash para obtener la opción seleccionada y ejecutar su función de acción.
+
+#### dibuja.c y dibuja.h
+ 
+  * `dibuja_imagen` abre un archivo de imagen ASCII, lee cada línea del archivo y la muestra en la consola, y luego cierra el archivo.
+
+  * el denominado `ascii art` que se puede apreciar al utilizar este trabajo práctico, se realizó mediante `jp2a`. Esta es una herramienta de línea de comandos que convierte imágenes en ASCII utilizando los códigos de escape ANSI para formatear colores, los cuales son compatibles con printf y en la terminal de Linux. Funciona con archivos JPEG y PNG. También permite generar una salida en color y seleccionar un conjunto de caracteres para representar la imagen en ASCII.
+    Para utilizar jp2a, primero debes instalarlo ejecutando el siguiente comando:
+    - sudo apt install jp2a
+    Una vez instalado, puedes obtener una salida en color y guardar el texto ASCII en un archivo de la siguiente manera:
+    - jp2a --output=ascii.txt --colors input.png
+    Este comando tomará la imagen de entrada "input.png", generará una representación en ASCII y la guardará en el archivo "ascii.txt". La opción "--colors" permite conservar los colores de la imagen original en la salida ASCII.
+
+#### utils.c y utils.h
+
+  * `convertirCapital`: Esta función convierte la primera letra de una cadena de caracteres en mayúscula y las demás letras en minúscula. Además, también convierte la primera letra de cada oración (separada por ". ") en mayúscula. Utiliza las funciones toupper() y tolower() para realizar las conversiones.
+
+  * `convertirMinusculas`: Esta función convierte todas las letras de una cadena de caracteres en minúsculas. Utiliza la función tolower() para realizar la conversión.
+
+  * `reemplazarPalabra`: Esta función busca una palabra específica (palabraBuscada) en un texto dado (texto) y la reemplaza con otra palabra (palabraReemplazo). Utiliza las funciones strstr() para encontrar la posición de la palabra buscada y memmove() y memcpy() para realizar el reemplazo.
+
+  * `subrayarPalabra`: Esta función subraya una palabra específica (palabra_a_Subrayar) en un texto dado (texto). Crea una nueva cadena de caracteres con la palabra subrayada utilizando los códigos de escape ANSI para el subrayado. Luego, utiliza la función reemplazarPalabra() para reemplazar la palabra original con la palabra subrayada.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"menu.h": Este archivo es un encabezado que contiene la declaración de la estructura menu_t y las funciones relacionadas con el manejo de menús, como la creación, destrucción y manipulación de opciones del menú.
+
+"utils.h": Este archivo es otro encabezado que contiene algunas funciones de utilidad utilizadas en el programa, como la función convertirMinusculas, que convierte una cadena de caracteres a minúsculas, y la función subrayarPalabra, que subraya una palabra específica dentro de una cadena.
+
+"dibuja.h": Este archivo es un encabezado que contiene la declaración de la función dibuja_imagen, que se encarga de mostrar una imagen en la consola.
+
+"hash.h": Este archivo es un encabezado que contiene la declaración de la estructura hash_t y las funciones relacionadas con el manejo de tablas hash, como la creación, destrucción e inserción de elementos en el hash.
+
+"menu.c": Este archivo contiene la implementación de las funciones declaradas en "menu.h". Aquí se definen las funciones para crear un menú, agregar opciones, mostrar el menú, obtener la elección del usuario, etc. También se implementan las funciones auxiliares para destruir opciones del menú y mostrar información en pantalla.
+
+"utils.c": Este archivo contiene la implementación de las funciones declaradas en "utils.h". Aquí se define la función convertirMinusculas, que convierte una cadena de caracteres a minúsculas, y la función subrayarPalabra, que subraya una palabra específica dentro de una cadena.
+
+"dibuja.c": Este archivo contiene la implementación de la función dibuja_imagen declarada en "dibuja.h". Aquí se define cómo se muestra una imagen en la consola.
+
+"hash.c": Este archivo contiene la implementación de las funciones declaradas en "hash.h". Aquí se define la estructura y las funciones para crear, destruir y manipular tablas hash.
+
+Estos archivos se utilizan conjuntamente para implementar un programa que permite crear y mostrar menús interactivos en la consola, con opciones que el usuario puede seleccionar. Cada opción del menú tiene un nombre, una descripción, una letra de acceso rápido y una función de acción asociada que se ejecuta cuando el usuario elige esa opción.

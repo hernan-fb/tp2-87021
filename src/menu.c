@@ -34,11 +34,6 @@ menu_t *menu_crear(bool mostrar_comandos_previos,
     return NULL;
   }
 
-  /*menu->opciones = lista_crear();
-  if (menu->opciones == NULL) {
-      free(menu);
-      return NULL;
-  }*/
   if (accion == NULL) {
     accion = mensaje_error_simple;
   }
@@ -48,14 +43,12 @@ menu_t *menu_crear(bool mostrar_comandos_previos,
   menu->muestra_comandos_previos = mostrar_comandos_previos;
   menu->hash_nombre_opcion = hash_crear(13);
   if (menu->hash_nombre_opcion == NULL) {
-    // lista_destruir(menu->opciones, NULL);
     free(menu);
     return NULL;
   }
 
   menu->hash_letra_nombre = hash_crear(13);
   if (menu->hash_letra_nombre == NULL) {
-    // lista_destruir(menu->opciones, NULL);
     hash_destruir(menu->hash_nombre_opcion);
     free(menu);
     return NULL;
@@ -63,12 +56,7 @@ menu_t *menu_crear(bool mostrar_comandos_previos,
 
   return menu;
 }
-/*
-bool wrapper_free(void* dato, void* contexto) {
-    free(dato);
-    return true;
-}
-*/
+
 void opcion_destruir(void *opcion) {
   free(((opcion_t *)opcion)->letra_alias);
   free(((opcion_t *)opcion)->nombre_alias);
@@ -79,8 +67,6 @@ void opcion_destruir(void *opcion) {
 
 // Destruir el menú
 bool menu_destruir(menu_t *menu) {
-  // lista_destruir(menu->opciones, NULL);
-  // hash_con_cada_clave(menu,wrapper_free,NULL);
   hash_destruir(menu->hash_letra_nombre);
   hash_destruir_todo(menu->hash_nombre_opcion, opcion_destruir);
   free(menu);
@@ -89,8 +75,7 @@ bool menu_destruir(menu_t *menu) {
 
 // Agregar una opción al menú
 bool menu_agregar_opcion(menu_t *menu, char *nombre, char *texto_descripcion,
-                         char letra,
-                         bool (*accion)()) { // menu_t* nuevo_menu, void* aux
+                         char letra, bool (*accion)()) {
   if (menu == NULL || nombre == NULL || accion == NULL) {
     return false;
   }
@@ -158,23 +143,14 @@ bool menu_agregar_opcion(menu_t *menu, char *nombre, char *texto_descripcion,
 
   free(nombre_copia);
   free(descripcion_copia);
-  /*if (!lista_insertar(menu->opciones, opcion)) {
-      free(opcion);
-      return false;
-  }*/
-  // print printf("insertando: nombre %s, opcion\n", nombre);
   if (!hash_insertar(menu->hash_nombre_opcion, nombre, opcion, NULL)) {
-    // lista_borrar_primero(menu->opciones);
     free(opcion->nombre_alias);
     free(opcion->descripcion);
     free(opcion);
     return false;
   }
-  // print printf("insertando: letra: %c, nombre: %s\n", opcion->letra_alias,
-  // nombre);
   if (!hash_insertar(menu->hash_letra_nombre, opcion->letra_alias, nombre,
                      NULL)) {
-    // lista_borrar_primero(menu->opciones);
     free(opcion->nombre_alias);
     free(opcion->descripcion);
     free(opcion);
@@ -196,6 +172,7 @@ bool wrapper_print(const char *clave, void *valor, void *aux) {
          (char *)valor);
   return true;
 }
+
 /*
 typedef struct {
     size_t valor1;
@@ -227,7 +204,6 @@ void menu_mostrar(menu_t *menu) {
     dibuja_imagen(menu->imagenes[numero_aleatorio]);
   }
   size_t contador_auxiliar = 0;
-  // size_t cantidad = hash_cantidad(menu->hash_nombre_opcion);
   printf("Comandos disponibles:\n");
   hash_con_cada_clave(menu->hash_nombre_opcion, imprime_opcion_de_menu,
                       &contador_auxiliar);
@@ -256,7 +232,6 @@ bool menu_get_eleccion_usuario(menu_t *menu) {
   opcion_t *opcion_elegida = NULL;
   char *alias_elegido = NULL;
   bool respuesta = true;
-  // print printf("texto_ingresado: %s\n", texto_ingresado);
   if (longitud_texto_ingresado == 1) {
     char *c = malloc(sizeof(char) * 2);
     if (c == NULL) {
@@ -265,16 +240,11 @@ bool menu_get_eleccion_usuario(menu_t *menu) {
     }
     c[0] = texto_ingresado[0];
     c[1] = '\0';
-    // print printf("caracter ingresado: %c", c);
     alias_elegido = hash_obtener(menu->hash_letra_nombre, c);
     free(c);
-    // print size_t contador_temporal = 0;
-    // print hash_con_cada_clave(menu->hash_letra_nombre, wrapper_print,
-    // &contador_temporal);
     if (alias_elegido == NULL) {
       menu->accion_en_caso_de_mal_ingreso(menu, texto_ingresado);
     } else {
-      // print printf("alias: %s", alias_elegido);
       opcion_elegida = hash_obtener(menu->hash_nombre_opcion, alias_elegido);
       if (opcion_elegida == NULL) {
         printf("hubo un error\n");
