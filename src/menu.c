@@ -214,7 +214,7 @@ bool busca_opcion_nro_de_menu(const char *clave, void *valor, void *aux){
 // Mostrar el menú y solicitar una opción al usuario
 void menu_mostrar(menu_t *menu) {
   if (!menu->muestra_comandos_previos) {
-    // system("clear");
+    system("clear");
   }
   unsigned int numero_aleatorio = 0;
   if (menu->cantidad_imagenes > 1) {
@@ -231,6 +231,10 @@ void menu_mostrar(menu_t *menu) {
   printf("Comandos disponibles:\n");
   hash_con_cada_clave(menu->hash_nombre_opcion, imprime_opcion_de_menu,
                       &contador_auxiliar);
+}
+
+size_t menu_cuantas_opciones_fueron_agregadas(menu_t *menu) {
+  return hash_cantidad(menu->hash_letra_nombre);
 }
 
 void limpiar_buffer_entrada() {

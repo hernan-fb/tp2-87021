@@ -48,6 +48,8 @@ bool imprime_opcion_de_menu(const char *clave, void *valor, void *aux);
 // Mostrar el menú y solicitar una opción al usuario
 void menu_mostrar(menu_t *menu);
 
+size_t menu_cuantas_opciones_fueron_agregadas(menu_t *menu);
+
 bool menu_get_eleccion_usuario(menu_t *menu);
 
 void limpiar_buffer_entrada();
