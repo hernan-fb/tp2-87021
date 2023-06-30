@@ -10,7 +10,6 @@ void convertirCapital(char *string) {
   // Convertir primera letra a mayúscula, independientemente de que la palabra
   // esté subrayada
   size_t var = strlen(ANSI_UNDERLINE);
-  printf("var %zu\n", var);
   if (strncmp(string, ANSI_UNDERLINE, var) != 0) {
     var = 0;
   }

@@ -12,7 +12,7 @@ typedef struct menu_t menu_t;
 // TDA Opcion
 typedef struct {
   char *nombre_alias;
-  char letra_alias;
+  char *letra_alias;
   char *descripcion;
   bool (*accion)(); // menu_t* nuevo_menu, void* aux
 } opcion_t;

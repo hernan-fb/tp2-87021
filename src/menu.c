@@ -70,6 +70,7 @@ bool wrapper_free(void* dato, void* contexto) {
 }
 */
 void opcion_destruir(void *opcion) {
+  free(((opcion_t *)opcion)->letra_alias);
   free(((opcion_t *)opcion)->nombre_alias);
   free(((opcion_t *)opcion)->descripcion);
   free(opcion);
@@ -132,15 +133,28 @@ bool menu_agregar_opcion(menu_t *menu, char *nombre, char *texto_descripcion,
     printf("Error al asignar memoria.\n");
     free(opcion->nombre_alias);
     free(opcion);
+    free(nombre_copia);
+    free(descripcion_copia);
     return false;
   }
-
+  opcion->letra_alias = malloc(2 * sizeof(char)); // 1+1 para el carácter nulo
+  if (opcion->nombre_alias == NULL) {
+    printf("Error al asignar memoria.\n");
+    free(opcion->nombre_alias);
+    free(opcion->descripcion);
+    free(opcion);
+    free(nombre_copia);
+    free(descripcion_copia);
+    return false;
+  }
   strcpy(opcion->nombre_alias, nombre_copia);
+  opcion->letra_alias[0] = letra; // Asignar el carácter a letra_alias
+  opcion->letra_alias[1] =
+      '\0'; // Asegurar que letra_alias esté terminado con el carácter nulo
   strcpy(opcion->descripcion, descripcion_copia);
   subrayarPalabra(&(opcion->descripcion), nombre_copia);
   convertirCapital(opcion->descripcion);
   opcion->accion = accion;
-  opcion->letra_alias = letra;
 
   free(nombre_copia);
   free(descripcion_copia);
@@ -158,7 +172,7 @@ bool menu_agregar_opcion(menu_t *menu, char *nombre, char *texto_descripcion,
   }
   // print printf("insertando: letra: %c, nombre: %s\n", opcion->letra_alias,
   // nombre);
-  if (!hash_insertar(menu->hash_letra_nombre, &(opcion->letra_alias), nombre,
+  if (!hash_insertar(menu->hash_letra_nombre, opcion->letra_alias, nombre,
                      NULL)) {
     // lista_borrar_primero(menu->opciones);
     free(opcion->nombre_alias);
@@ -172,7 +186,7 @@ bool menu_agregar_opcion(menu_t *menu, char *nombre, char *texto_descripcion,
 
 bool imprime_opcion_de_menu(const char *clave, void *valor, void *aux) {
   opcion_t *opcion = valor;
-  printf("\t%zu. %s. (%c)\n", ++(*(size_t *)aux), opcion->descripcion,
+  printf("\t%zu. %s. (%s)\n", ++(*(size_t *)aux), opcion->descripcion,
          opcion->letra_alias);
   return true;
 }
@@ -200,16 +214,18 @@ bool busca_opcion_nro_de_menu(const char *clave, void *valor, void *aux){
 // Mostrar el menú y solicitar una opción al usuario
 void menu_mostrar(menu_t *menu) {
   if (!menu->muestra_comandos_previos) {
-    system("clear");
+    // system("clear");
   }
   unsigned int numero_aleatorio = 0;
   if (menu->cantidad_imagenes > 1) {
     time_t current_time = time(NULL);
     srand((unsigned int)current_time);
     numero_aleatorio =
-        (unsigned int)((size_t)rand() % (menu->cantidad_imagenes + 1));
+        (unsigned int)((size_t)rand() % (menu->cantidad_imagenes));
   }
-  dibuja_imagen(menu->imagenes[numero_aleatorio]);
+  if (menu->cantidad_imagenes > 0) {
+    dibuja_imagen(menu->imagenes[numero_aleatorio]);
+  }
   size_t contador_auxiliar = 0;
   // size_t cantidad = hash_cantidad(menu->hash_nombre_opcion);
   printf("Comandos disponibles:\n");
@@ -235,12 +251,19 @@ bool menu_get_eleccion_usuario(menu_t *menu) {
 
   opcion_t *opcion_elegida = NULL;
   char *alias_elegido = NULL;
-  bool respuesta;
+  bool respuesta = true;
   // print printf("texto_ingresado: %s\n", texto_ingresado);
   if (longitud_texto_ingresado == 1) {
-    char c = texto_ingresado[0];
+    char *c = malloc(sizeof(char) * 2);
+    if (c == NULL) {
+      printf("hubo un error\n");
+      return false;
+    }
+    c[0] = texto_ingresado[0];
+    c[1] = '\0';
     // print printf("caracter ingresado: %c", c);
-    alias_elegido = hash_obtener(menu->hash_letra_nombre, &c);
+    alias_elegido = hash_obtener(menu->hash_letra_nombre, c);
+    free(c);
     // print size_t contador_temporal = 0;
     // print hash_con_cada_clave(menu->hash_letra_nombre, wrapper_print,
     // &contador_temporal);

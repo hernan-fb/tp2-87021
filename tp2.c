@@ -17,7 +17,6 @@ const char *imagenes[] = {"img/_bulbasaur-solo_.txt", "img/_charmander1_.txt",
 const size_t cantidad_imagenes = 5;
 const char *imagen_bienvenida[] = {"img/_bienvenido_a_color_.txt"};
 bool flag = false;
-typedef enum { BULBASAUR, CHARMANDER, SQUIRTLE, PIKACHU } pokebola_t;
 
 typedef struct {
   int id;
@@ -239,8 +238,6 @@ menu_t *crear_menu_bienvenida() {
 }
 
 int main() {
-  char opcion;
-
   menu_t *menu_bienvenida = crear_menu_bienvenida();
   bool continuar_jugando = true;
   while (continuar_jugando) {

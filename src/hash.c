@@ -263,7 +263,8 @@ size_t hash_01(const void *clave, size_t largo_tabla_hash) {
 size_t hash_02(const void *clave, size_t largo_tabla_hash) {
   // Jenkins Hashing
   // Ref: https://en.wikipedia.org/wiki/Jenkins_hash_function
-  size_t i = 0, n = strlen((char *)clave);
+  size_t i = 0;
+  size_t n = strlen((char *)clave);
   uint32_t hash = 0;
   while (i != n) {
     hash += ((unsigned char *)clave)[i++];
